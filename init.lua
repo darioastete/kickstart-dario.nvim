@@ -209,6 +209,14 @@ vim.keymap.set('n', '<leader>q', '<cmd>q<cr>', { desc = 'Cerrar archivo' })
 vim.keymap.set('v', '<Tab>', '>gv', { desc = 'Indent and reselect' })
 vim.keymap.set('v', '<S-Tab>', '<gv', { desc = 'Unindent and reselect' })
 
+vim.keymap.set('n', '<leader>bn', '<Cmd>BufferNext<CR>', { desc = 'Next Buffer' })
+vim.keymap.set('n', '<leader>bp', '<Cmd>BufferPrevious<CR>', { desc = 'Previus Buffer' })
+vim.keymap.set('n', '<leader>bc', '<Cmd>BufferClose<CR>', { desc = 'Close current buffer' })
+vim.keymap.set('n', '<leader>bb', '<Cmd>BufferPick<CR>', { desc = 'Select buffer (letter)' })
+vim.keymap.set('n', '<leader>bo', '<Cmd>BufferCloseAllButCurrent<CR>', {
+  desc = 'Close All but Current Buffer',
+})
+
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
@@ -937,13 +945,14 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  require 'kickstart.plugins.debug',
+  -- require 'kickstart.plugins.debug',
   require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'custom.plugins.init',
+  require 'custom.plugins.barbar',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
