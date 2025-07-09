@@ -97,6 +97,11 @@ vim.g.have_nerd_font = false
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
+-- [[ Indentation settings ]]
+vim.opt.expandtab = true -- Usa espacios en lugar de tabs
+vim.opt.tabstop = 2 -- Número de espacios que representa un tab
+vim.opt.shiftwidth = 2 -- Número de espacios para indentado automático
+vim.opt.softtabstop = 2 -- Cuántos espacios al presionar <Tab>
 
 -- Make line numbers default
 vim.o.number = true
