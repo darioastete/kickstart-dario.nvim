@@ -242,6 +242,39 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- SPLIT CODE PAGE
+-- Split vertical con <leader> + Shift + |
+vim.keymap.set('n', '<leader>|', ':vsplit<CR>', { desc = 'Vertical Split' })
+
+-- Split horizontal con <leader> + Shift + -
+vim.keymap.set('n', '<leader>_', ':split<CR>', { desc = 'Horizontal Split' })
+
+-- Open terminal
+-- Terminal limpia principal
+-- Terminal 1: limpia
+vim.keymap.set('n', '<leader>tt', ':ToggleTerm 1<CR>', { desc = 'Terminal 1' })
+
+-- Terminal 2: otra sesión separada
+vim.keymap.set('n', '<leader>t2', ':ToggleTerm 2<CR>', { desc = 'Terminal 2' })
+
+--LAZYGIT
+vim.keymap.set('n', '<leader>gg', function()
+  require('toggleterm.terminal').Terminal
+    :new({
+      cmd = 'lazygit',
+      hidden = true,
+      direction = 'float',
+    })
+    :toggle()
+end, { desc = 'Toggle LazyGit' })
+
+local current_term = 1
+local max_terms = 3
+vim.keymap.set('n', '<leader>tn', function()
+  current_term = current_term % max_terms + 1
+  vim.cmd('ToggleTerm ' .. current_term)
+end, { desc = 'Next Terminal (rotate)' })
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'

@@ -79,4 +79,25 @@ return {
     'karb94/neoscroll.nvim',
     opts = {},
   },
+
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    opts = {
+      size = 15,
+      open_mapping = [[<c-\>]], -- presiona Ctrl+\ para mostrar/ocultar
+      direction = 'horizontal', -- puedes usar 'vertical' o 'float' también
+      shade_terminals = true,
+      start_in_insert = true,
+      persist_mode = true,
+      close_on_exit = true,
+      float_opts = {
+        border = 'curved',
+        winblend = 0,
+        -- You can define specific height/width for floating terminals here
+        -- height = 25,
+        -- width = 100,
+      },
+    },
+  },
 }
