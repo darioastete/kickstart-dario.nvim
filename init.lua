@@ -103,11 +103,13 @@ vim.opt.tabstop = 2 -- Número de espacios que representa un tab
 vim.opt.shiftwidth = 2 -- Número de espacios para indentado automático
 vim.opt.softtabstop = 2 -- Cuántos espacios al presionar <Tab>
 
+vim.opt.conceallevel = 2
+
 -- Make line numbers default
 vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.o.relativenumber = true
+vim.o.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -405,6 +407,8 @@ require('lazy').setup({
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>f', group = 'Find' },
         { '<leader>b', group = 'Buffer' },
+        { '<leader>o', group = 'Obsidian' },
+        { '<leader>on', group = 'New' },
       },
     },
   },
@@ -455,10 +459,19 @@ require('lazy').setup({
         end,
         desc = '[S]earch [N]eovim files',
       },
+      {
+        '<leader>fW',
+        function()
+          require('fzf-lua').grep_project {
+            prompt = '>',
+            grep_opts = '--no-ignore --hidden',
+          }
+        end,
+        desc = '[S]earch in [P]roject',
+      },
     },
     config = function()
       require('fzf-lua').setup {
-        -- 'telescope', -- usa estilo visual similar a telescope
         winopts = {
           height = 0.95,
           width = 0.95,
@@ -992,6 +1005,8 @@ require('lazy').setup({
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'custom.plugins.init',
   require 'custom.plugins.barbar',
+  require 'custom.plugins.obsidian',
+  require 'custom.plugins.nvim-cmp',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
