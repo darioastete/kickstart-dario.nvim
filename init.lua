@@ -224,6 +224,16 @@ vim.keymap.set('n', '<leader>bo', '<Cmd>BufferCloseAllButCurrent<CR>', {
   desc = 'Close All but Current Buffer',
 })
 
+-- Toggle Code or fold
+-- Toggle fold bajo el cursor
+vim.keymap.set('n', 'za', 'za', { desc = 'Toggle Fold' })
+
+-- Cerrar todos los folds
+vim.keymap.set('n', 'zM', 'zM', { desc = 'Fold All' })
+
+-- Abrir todos los folds
+vim.keymap.set('n', 'zR', 'zR', { desc = 'Unfold All' })
+
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
@@ -968,7 +978,19 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -979,7 +1001,18 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      folds = {
+        enable = true,
+      },
     },
+    config = function(_, opts)
+      require('nvim-treesitter.configs').setup(opts)
+      vim.opt.foldmethod = 'expr'
+      vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+      vim.opt.foldenable = true
+      vim.opt.foldlevel = 99
+      vim.opt.foldlevelstart = 99
+    end,
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
     --
