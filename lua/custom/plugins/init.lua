@@ -42,6 +42,12 @@ return {
     end,
   },
   {
+    'max397574/better-escape.nvim',
+    config = function()
+      require('better_escape').setup()
+    end,
+  },
+  {
     'brenton-leighton/multiple-cursors.nvim',
     version = '*', -- Use the latest tagged version
     opts = {}, -- This causes the plugin setup function to be called

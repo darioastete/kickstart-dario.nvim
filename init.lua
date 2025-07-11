@@ -404,6 +404,7 @@ require('lazy').setup({
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>f', group = 'Find' },
+        { '<leader>b', group = 'Buffer' },
       },
     },
   },
