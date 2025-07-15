@@ -817,6 +817,7 @@ require('lazy').setup({
     version = '1.*',
     dependencies = {
       -- Snippet Engine
+      'hrsh7th/nvim-cmp',
       {
         'L3MON4D3/LuaSnip',
         version = '2.*',
@@ -869,7 +870,15 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'enter',
+        preset = 'default',
+        ['<CR>'] = { 'accept', 'fallback' },
+        ['<Tab>'] = { 'select_next', 'fallback' },
+        ['<S-Tab>'] = { 'select_prev', 'fallback' },
+        ['<M-space>'] = {
+          function(cmp)
+            cmp.show { providers = { 'snippets' } }
+          end,
+        },
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -878,17 +887,38 @@ require('lazy').setup({
       appearance = {
         -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
         -- Adjusts spacing to ensure icons are aligned
+        -- use_nvim_cmp_as_default = true,
         nerd_font_variant = 'mono',
       },
 
       completion = {
+        menu = {
+          border = 'rounded',
+          draw = {
+            columns = {
+              { 'label', 'label_description', gap = 1 },
+              { 'kind_icon', 'kind' },
+            },
+          },
+        },
+        ghost_text = {
+          enabled = true,
+        },
+
+        trigger = {
+          shown_on_keyword = true,
+        },
+        list = {
+          preselect = true,
+          auto_insert = true,
+        },
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
-        documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        documentation = { auto_show = true, auto_show_delay_ms = 300 },
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev' },
+        default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer' },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
         },
