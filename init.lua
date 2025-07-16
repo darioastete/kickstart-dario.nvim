@@ -826,6 +826,7 @@ require('lazy').setup({
     dependencies = {
       -- Snippet Engine
       'hrsh7th/nvim-cmp',
+      'Kaiser-Yang/blink-cmp-avante',
       {
         'L3MON4D3/LuaSnip',
         version = '2.*',
@@ -895,7 +896,7 @@ require('lazy').setup({
       appearance = {
         -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
         -- Adjusts spacing to ensure icons are aligned
-        -- use_nvim_cmp_as_default = true,
+        use_nvim_cmp_as_default = true,
         nerd_font_variant = 'mono',
       },
 
@@ -915,6 +916,7 @@ require('lazy').setup({
 
         trigger = {
           shown_on_keyword = true,
+          disable_characters = { '@' }, -- 👈 evita que se active cmp al escribir @
         },
         list = {
           preselect = true,
@@ -926,9 +928,16 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer' },
+        default = { 'avante', 'lsp', 'path', 'snippets', 'lazydev', 'buffer' },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+          avante = {
+            module = 'blink-cmp-avante',
+            name = 'Avante',
+            opts = {
+              -- options for blink-cmp-avante
+            },
+          },
         },
       },
 
