@@ -18,26 +18,49 @@ return {
       'rcarriga/nvim-notify',
     },
   },
+  -- {
+  --   'echasnovski/mini.comment',
+  --   version = '*',
+  --   config = function()
+  --     local comment = require 'mini.comment'
+  --     comment.setup()
+  --
+  --     -- Keymaps para comentar
+  --     vim.keymap.set('n', '<leader>/', function()
+  --       local line = vim.api.nvim_win_get_cursor(0)[1]
+  --       comment.toggle_lines(line, line)
+  --     end, { desc = 'Comment current line' })
+  --
+  --     vim.keymap.set('v', '<leader>/', function()
+  --       local start_line = vim.fn.line 'v'
+  --       local end_line = vim.fn.line '.'
+  --       if start_line > end_line then
+  --         start_line, end_line = end_line, start_line
+  --       end
+  --       comment.toggle_lines(start_line, end_line)
+  --     end, { desc = 'Comment selection' })
+  --   end,
+  -- },
   {
-    'echasnovski/mini.comment',
-    version = '*',
+    'numToStr/Comment.nvim',
+    dependencies = { 'JoosepAlviste/nvim-ts-context-commentstring' },
     config = function()
-      local comment = require 'mini.comment'
-      comment.setup()
-
-      -- Keymaps para comentar
+      require('ts_context_commentstring').setup { enable_autocmd = false }
+      require('Comment').setup {
+        pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook(),
+        mappings = {
+          basic = false,
+          extra = false,
+        },
+      }
       vim.keymap.set('n', '<leader>/', function()
-        local line = vim.api.nvim_win_get_cursor(0)[1]
-        comment.toggle_lines(line, line)
-      end, { desc = 'Comment current line' })
+        require('Comment.api').toggle.linewise.current()
+      end, { desc = 'Comment line' })
 
       vim.keymap.set('v', '<leader>/', function()
-        local start_line = vim.fn.line 'v'
-        local end_line = vim.fn.line '.'
-        if start_line > end_line then
-          start_line, end_line = end_line, start_line
-        end
-        comment.toggle_lines(start_line, end_line)
+        local esc = vim.api.nvim_replace_termcodes('<ESC>', true, false, true)
+        vim.api.nvim_feedkeys(esc, 'x', false)
+        require('Comment.api').toggle.linewise(vim.fn.visualmode())
       end, { desc = 'Comment selection' })
     end,
   },
