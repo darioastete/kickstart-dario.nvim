@@ -506,8 +506,45 @@ require('lazy').setup({
       },
     },
   },
+  -- {
+  --   'github/copilot.vim',
+  -- },
   {
-    'github/copilot.vim',
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    build = ':Copilot auth',
+    opts = {
+      suggestion = {
+        enabled = true,
+        auto_trigger = true, -- 🔥 como en VSCode: aparecen las sugerencias solas
+        debounce = 75,
+        keymap = {
+          accept = '<C-l>', -- acepta la sugerencia
+          accept_word = false,
+          accept_line = false,
+          next = '<C-]>', -- Ctrl + ]
+          prev = '<C-[>', -- Ctrl + [
+          dismiss = '<C-h>', -- descartar
+        },
+      },
+      panel = {
+        enabled = false, -- ❌ desactiva el panel lateral (como en VSCode)
+      },
+      filetypes = {
+        markdown = true,
+        help = false,
+        gitcommit = true,
+        sh = true,
+        lua = true,
+        python = true,
+        javascript = true,
+        typescript = true,
+        vue = true,
+        astro = true,
+        ['*'] = true, -- habilita para todos
+      },
+    },
   },
   {
     -- Main LSP Configuration
@@ -853,7 +890,7 @@ require('lazy').setup({
     version = '1.*',
     dependencies = {
       -- Snippet Engine
-      'hrsh7th/nvim-cmp',
+      -- 'hrsh7th/nvim-cmp',
       'Kaiser-Yang/blink-cmp-avante',
       {
         'L3MON4D3/LuaSnip',
@@ -1152,7 +1189,7 @@ require('lazy').setup({
   require 'custom.plugins.init',
   require 'custom.plugins.barbar',
   require 'custom.plugins.obsidian',
-  require 'custom.plugins.nvim-cmp',
+  -- require 'custom.plugins.nvim-cmp',
   require 'custom.plugins.auto-tag',
   require 'custom.plugins.avante',
 
