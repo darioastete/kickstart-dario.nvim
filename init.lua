@@ -523,8 +523,8 @@ require('lazy').setup({
           accept = '<C-l>', -- acepta la sugerencia
           accept_word = false,
           accept_line = false,
-          next = '<C-]>', -- Ctrl + ]
-          prev = '<C-[>', -- Ctrl + [
+          next = '<M-]>', -- ⌥ + ]
+          prev = '<M-[>',
           dismiss = '<C-h>', -- descartar
         },
       },
