@@ -138,6 +138,26 @@ vim.o.confirm = true
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
+-- replace words with confirmation on my current file
+vim.keymap.set('n', '<leader>rw', function()
+  local word = vim.fn.expand '<cword>'
+  local repl = vim.fn.input('Replace "' .. word .. '" for: ')
+  if repl == '' then
+    return
+  end
+  vim.cmd(string.format('%%s/\\V\\<%s\\>/%s/gc', vim.fn.escape(word, [[/\]]), vim.fn.escape(repl, [[/\]])))
+end, { desc = 'Replace word (global, confirm)' })
+
+-- replace words without confirmation on my current file
+vim.keymap.set('n', '<leader>rW', function()
+  local word = vim.fn.expand '<cword>'
+  local repl = vim.fn.input('Replace "' .. word .. '" for: ')
+  if repl == '' then
+    return
+  end
+  vim.cmd(string.format('%%s/\\V\\<%s\\>/%s/g', vim.fn.escape(word, [[/\]]), vim.fn.escape(repl, [[/\]])))
+end, { desc = 'Replace word (global, direct)' })
+
 -- Diagnostic keymaps
 -- vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
@@ -388,12 +408,16 @@ require('lazy').setup({
       -- Document existing key chains
       spec = {
         { '<leader>s', group = '[S]earch' },
-        { '<leader>t', group = '[T]oggle' },
+        { '<leader>t', group = '[T]oggle terminal' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>f', group = 'Find' },
         { '<leader>b', group = 'Buffer' },
         { '<leader>o', group = 'Obsidian' },
         { '<leader>on', group = 'New' },
+        { '<leader>r', group = 'Replace Words' },
+        { '<leader>g', group = 'Lazy Git' },
+        { '<leader>a', group = 'Avante' },
+        { '<leader>v', group = 'Vue' },
       },
     },
   },

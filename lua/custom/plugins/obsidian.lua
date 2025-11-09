@@ -15,6 +15,12 @@ return {
           path = '~/Documents/obsidian/personal',
         },
       },
+      templates = {
+        folder = 'Templates', -- or "Templates" if you use that
+        -- optional:
+        date_format = '%Y-%m-%d',
+        time_format = '%H:%M',
+      },
       completion = {
         nvim_cmp = true,
         min_chars = 2,
@@ -90,7 +96,7 @@ return {
             'n',
             '<leader>onn',
             function()
-              local title = vim.fn.input '📝 Nombre de la nota: '
+              local title = vim.fn.input '📝 Note name: '
               if title == '' then
                 return
               end
@@ -105,7 +111,11 @@ return {
             'n',
             '<leader>ont',
             function()
-              require('obsidian').util.insert_template 'Newsletter-Issue'
+              local title = vim.fn.input '📝 Note name: '
+              if title == '' then
+                return
+              end
+              vim.cmd('ObsidianNewFromTemplate ' .. title)
             end,
             vim.tbl_extend('force', base_opts, {
               desc = 'Obsidian Insertar Template',
