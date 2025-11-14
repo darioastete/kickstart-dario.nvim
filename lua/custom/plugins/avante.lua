@@ -17,8 +17,28 @@ return {
   opts = {
     -- add any opts here
     -- for example
-    provider = 'copilot',
+    -- provider = 'copilot',
+    provider = 'moonshot',
     providers = {
+      openai = {
+        endpoint = 'https://api.openai.com/v1',
+        model = 'gpt-5-nano', -- o 'gpt-4-turbo', 'gpt-3.5-turbo', etc.
+        timeout = 30000,
+        -- extra_request_body = {
+        --   temperature = 0.7,
+        --   max_tokens = 2048,
+        -- },
+      },
+      moonshot = {
+        endpoint = 'https://api.moonshot.ai/v1',
+        -- model = 'kimi-k2-0711-preview',
+        model = 'kimi-k2-turbo-preview',
+        timeout = 30000,
+        extra_request_body = {
+          temperature = 0.6,
+          max_tokens = 32768,
+        },
+      },
       -- claude = {
       --   endpoint = 'https://api.anthropic.com',
       --   model = 'claude-sonnet-4-20250514',
