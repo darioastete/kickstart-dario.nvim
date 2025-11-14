@@ -170,10 +170,10 @@ end, { desc = 'Replace word (global, direct)' })
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move fucking idiot!!"<CR>')
+vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move fucking idiot!!"<CR>')
+vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move fucking idiot!!"<CR>')
+vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move fucking idiot!!"<CR>')
 
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
@@ -202,16 +202,6 @@ vim.keymap.set('n', '<leader>bo', '<Cmd>BufferCloseAllButCurrent<CR>', {
   desc = 'Close All but Current Buffer',
 })
 
--- Toggle Code or fold
--- Toggle fold bajo el cursor
-vim.keymap.set('n', 'za', 'za', { desc = 'Toggle Fold' })
-
--- Cerrar todos los folds
-vim.keymap.set('n', 'zM', 'zM', { desc = 'Fold All' })
-
--- Abrir todos los folds
-vim.keymap.set('n', 'zR', 'zR', { desc = 'Unfold All' })
-
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
@@ -232,9 +222,27 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- Diagnostic function
+local function copy_full_diag()
+  local d = vim.diagnostic.get(0, { lnum = vim.fn.line '.' - 1 })[1]
+  if not d then
+    return
+  end
+  local text = (d.code and d.code .. ': ' or '') .. d.message
+  vim.fn.setreg('+', text)
+  vim.notify('Copied: ' .. text, vim.log.levels.INFO)
+end
+vim.keymap.set('n', '<leader>Y', copy_full_diag, { desc = 'Copy Diagnostic Message' })
+
 -- SPLIT CODE PAGE
 -- Split vertical con <leader> + Shift + |
 vim.keymap.set('n', '<leader>|', ':vsplit<CR>', { desc = 'Vertical Split' })
+vim.keymap.set('n', '<leader>H', ':vertical resize -5<CR>', { desc = 'Decrease width' })
+vim.keymap.set('n', '<leader>L', ':vertical resize +5<CR>', { desc = 'Increase width' })
+vim.keymap.set('n', '<leader>J', ':resize -5<CR>', { desc = 'Decrease height' })
+vim.keymap.set('n', '<leader>K', ':resize +5<CR>', { desc = 'Increase height' })
+
+-- Resize Mode: usa <leader>r para entrar
 
 --TEMPLATES
 --VUE
@@ -250,8 +258,30 @@ defineProps<{}>();
   vim.api.nvim_put(vim.split(template, '\n'), 'l', true, true)
 end, { desc = 'Insert Vue template' })
 --
---
---
+local function resize_mode()
+  vim.notify('Resize mode  (h/j/k/l)', vim.log.levels.INFO)
+
+  local map = { -- [key] = {dirección, signo}
+    h = { 'vertical', '-' },
+    l = { 'vertical', '+' },
+    j = { '', '-' },
+    k = { '', '+' },
+  }
+
+  while true do
+    local key = vim.fn.getcharstr()
+    local rule = map[key]
+    if not rule then
+      break
+    end
+
+    local dir, sign = rule[1], rule[2]
+    local step = vim.v.count1 * 3 -- 3, 6, 9…
+    vim.api.nvim_command(('silent! %s resize %s%s'):format(dir, sign, step))
+  end
+end
+
+vim.keymap.set('n', '<leader>R', resize_mode, { desc = 'Enter resize mode' })
 
 -- Split horizontal con <leader> + Shift + -
 vim.keymap.set('n', '<leader>_', ':split<CR>', { desc = 'Horizontal Split' })
@@ -878,8 +908,22 @@ require('lazy').setup({
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
-        typescript = { 'prettierd' },
-        typescriptreact = { 'prettierd' },
+        -- typescript = { 'prettierd' },
+        -- typescriptreact = { 'prettierd' },
+        formatters_by_ft = {
+          javascript = { 'prettierd' },
+          javascriptreact = { 'prettierd' },
+          typescript = { 'prettierd' },
+          typescriptreact = { 'prettierd' },
+          json = { 'prettierd' },
+          jsonc = { 'prettierd' },
+          html = { 'prettierd' },
+          css = { 'prettierd' },
+          scss = { 'prettierd' },
+          markdown = { 'prettierd' },
+          lua = { 'stylua' },
+          vue = { 'prettierd' },
+        },
       },
     },
   },
@@ -1192,6 +1236,7 @@ require('lazy').setup({
   -- require 'custom.plugins.nvim-cmp',
   require 'custom.plugins.auto-tag',
   require 'custom.plugins.avante',
+  require 'custom.plugins.ufo',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
