@@ -49,6 +49,87 @@ return {
       --   },
       -- },
     },
+    behaviour = {
+      auto_suggestions = false,
+      auto_approve_tool_permissions = false,
+      confirmation_ui_style = 'inline_buttons',
+    },
+    -- system_prompt as function ensures LLM always has latest MCP server state
+    -- This is evaluated for every message, even in existing chats
+    -- system_prompt = function()
+    --   local hub = require('mcphub').get_hub_instance()
+    --   return hub and hub:get_active_servers_prompt() or ''
+    -- end,
+    -- -- Using function prevents requiring mcphub before it's loaded
+    -- custom_tools = function()
+    --   return {
+    --     require('mcphub.extensions.avante').mcp_tool(),
+    --   }
+    -- end,
+    shortcuts = {
+      {
+        name = 'commit_309',
+        description = 'Generate commit message',
+        details = 'Generate a conventional commit message in Spanish analyzing git diff',
+        prompt = [[
+          You are a Git and GitHub expert. Analyze the following code diff and generate both:
+          1. A concise and conventional **commit message**.
+          2. A **Pull Request title and description**.
+
+          ---
+
+          ### COMMIT MESSAGE RULES
+          - **Format:** <type>(<scope>): <description>
+          - **Allowed types:** feat, fix, docs, style, refactor, test, chore, perf
+          - **If the user provides a type, use it exactly as given.**
+          - **If no type is provided, infer the most appropriate one from the diff.**
+          - **Use infinitive verbs in lowercase** (e.g., "add", "fix", "refactor").
+          - **Do not include a body or footer.**
+          - **The first line must not exceed 50 characters.**
+          - **Follow the Conventional Commits standard strictly.**
+          - **If the description exceeds 50 characters, rephrase it to fit while keeping clarity.**
+
+          ---
+
+          ### PULL REQUEST RULES
+          - The **title** should be clear and concise (max 80 characters), ideally expanding on the commit message.
+          - The **description** should summarize:
+            - What was changed.
+            - Why it was changed.
+            - How it impacts the system (optional).
+          - Keep the tone **professional and objective**.
+          - Use Markdown formatting when relevant (e.g., bullet points, short paragraphs).
+
+          ---
+
+          ### INPUT
+          Diff or description:
+          $text
+
+          ---
+
+          ### OUTPUT
+          Return only:
+          1. **Commit message:** in the specified format.
+          2. **Pull Request title:** short and descriptive.
+          3. **Pull Request description:** concise summary in Markdown.
+
+          Do not include any explanations or reasoning in the output.
+        ]],
+      },
+      {
+        name = 'refactor_dry_kiss',
+        description = 'Refactor code using DRY and KISS principles',
+        details = 'Refactor the following code to improve its structure using DRY and KISS principles',
+        prompt = [[
+          Refactoriza el siguiente código para mejorar su estructura usando los principios DRY (Don't Repeat Yourself) y KISS (Keep It Simple, Stupid).
+          Asegúrate de que el código resultante sea más limpio, eficiente y fácil de mantener, sin cambiar su funcionalidad original.
+          Código:
+          $text
+          Código refactorizado:
+        ]],
+      },
+    },
   },
   dependencies = {
     'nvim-lua/plenary.nvim',
@@ -88,4 +169,21 @@ return {
       ft = { 'markdown', 'Avante' },
     },
   },
+  -- config = function(_, opts)
+  --   require('avante').setup {
+  --     opts,
+  --     disabled_tools = {
+  --       'list_files', -- Built-in file operations
+  --       'search_files',
+  --       'read_file',
+  --       'create_file',
+  --       'rename_file',
+  --       'delete_file',
+  --       'create_dir',
+  --       'rename_dir',
+  --       'delete_dir',
+  --       'bash', -- Built-in terminal access
+  --     },
+  --   }
+  -- end,
 }

@@ -234,6 +234,40 @@ local function copy_full_diag()
 end
 vim.keymap.set('n', '<leader>Y', copy_full_diag, { desc = 'Copy Diagnostic Message' })
 
+--AVANTE
+-- Función que obtiene el diff y genera commit
+local function generate_commit_with_shortcut(shortcut_name)
+  local diff = vim.fn.system 'git diff --cached'
+  if diff == '' then
+    diff = vim.fn.system 'git diff'
+    if diff == '' then
+      print 'No hay cambios para commitear'
+      return
+    end
+  end
+
+  -- Guardar en registro con escape
+  local content = '#' .. shortcut_name .. '\n\n' .. diff
+  vim.fn.setreg('a', content) -- Usar registro 'a'
+
+  -- Abrir AvanteAsk
+  vim.cmd 'AvanteAsk'
+
+  -- Esperar y pegar
+  vim.defer_fn(function()
+    -- Limpiar buffer si tiene contenido
+    vim.cmd '%d'
+    -- Pegar del registro
+    vim.cmd 'normal! "ap'
+  end, 300)
+end
+
+vim.keymap.set('n', '<leader>gc', function()
+  generate_commit_with_shortcut 'commit_309'
+end, { desc = 'Generate commit from staged changes' })
+-- vim.keymap.set('n', '<leader>gc', function()
+--   generate_commit_with_shortcut 'commit_309'
+-- end, { desc = 'Generate commit from staged changes' })
 -- SPLIT CODE PAGE
 -- Split vertical con <leader> + Shift + |
 vim.keymap.set('n', '<leader>|', ':vsplit<CR>', { desc = 'Vertical Split' })
@@ -967,27 +1001,6 @@ require('lazy').setup({
     --- @type blink.cmp.Config
     opts = {
       keymap = {
-        -- 'default' (recommended) for mappings similar to built-in completions
-        --   <c-y> to accept ([y]es) the completion.
-        --    This will auto-import if your LSP supports it.
-        --    This will expand snippets if the LSP sent a snippet.
-        -- 'super-tab' for tab to accept
-        -- 'enter' for enter to accept
-        -- 'none' for no mappings
-        --
-        -- For an understanding of why the 'default' preset is recommended,
-        -- you will need to read `:help ins-completion`
-        --
-        -- No, but seriously. Please read `:help ins-completion`, it is really good!
-        --
-        -- All presets have the following mappings:
-        -- <tab>/<s-tab>: move to right/left of your snippet expansion
-        -- <c-space>: Open menu or open docs if already open
-        -- <c-n>/<c-p> or <up>/<down>: Select next/previous item
-        -- <c-e>: Hide menu
-        -- <c-k>: Toggle signature help
-        --
-        -- See :h blink-cmp-config-keymap for defining your own keymap
         preset = 'default',
         ['<CR>'] = { 'accept', 'fallback' },
         ['<Tab>'] = { 'select_next', 'fallback' },
@@ -997,14 +1010,9 @@ require('lazy').setup({
             cmp.show { providers = { 'snippets' } }
           end,
         },
-
-        -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-        --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
       },
 
       appearance = {
-        -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-        -- Adjusts spacing to ensure icons are aligned
         use_nvim_cmp_as_default = true,
         nerd_font_variant = 'mono',
       },
@@ -1237,6 +1245,7 @@ require('lazy').setup({
   require 'custom.plugins.auto-tag',
   require 'custom.plugins.avante',
   require 'custom.plugins.ufo',
+  -- require 'custom.plugins.mcphub',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
