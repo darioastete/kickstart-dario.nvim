@@ -237,99 +237,150 @@ vim.keymap.set('n', '<leader>Y', copy_full_diag, { desc = 'Copy Diagnostic Messa
 --AVANTE
 -- Función que obtiene el diff y genera commit
 local function generate_commit_with_shortcut(shortcut_name)
+  -- 1) Obtener diff (staged o working tree)
   local diff = vim.fn.system 'git diff --cached'
   if diff == '' then
     diff = vim.fn.system 'git diff'
     if diff == '' then
-      print 'No hay cambios para commitear'
+      vim.notify('No changes to commit', vim.log.levels.INFO)
       return
     end
   end
 
-  -- Wrapper seguro para inputs anidados
-  local function safe_input(prompt, callback, default)
+  -- 2) Helper de input con cancelación por ESC
+  local function ask_input(opts, cb)
+    -- opts: { prompt, default }
+    local ok, snacks_input = pcall(require, 'snacks.input')
+    if ok then
+      snacks_input.input({
+        prompt = opts.prompt,
+        default = opts.default or '',
+        -- centrado en pantalla
+        relative = 'editor',
+        position = 'center',
+        border = 'rounded',
+        width = 0.5,
+        row = '50%',
+        col = '50%',
+      }, function(answer)
+        -- En snacks, cerrar con Esc normalmente retorna nil -> lo tratamos como cancelación total
+        cb(answer) -- nil => cancelado
+      end)
+      return
+    end
+
+    -- Fallback: vim.ui.input (no centrado)
     vim.ui.input({
-      prompt = prompt,
-      default = default or '',
-      relative = 'editor',
-      position = 'center',
-      border = 'rounded',
-      width = 0.4,
-      row = '50%',
-      col = '50%',
-      cancelreturn = nil, -- Importante: no retornar string vacío en cancelar
-    }, function(input)
-      -- Llamar al callback incluso si input es nil (cancelado)
-      callback(input)
+      prompt = opts.prompt,
+      default = opts.default or '',
+      -- clave: al cancelar retorna nil
+      cancelreturn = nil,
+    }, function(answer)
+      cb(answer) -- nil => cancelado
     end)
   end
 
-  -- Cola de inputs
-  local task_code = ''
-  local subtask_code = ''
+  -- 3) Estado local y bandera de cancelación
+  local cancelled = false
+  local function cancel_all()
+    cancelled = true
+    vim.notify('Commit generation cancelled.', vim.log.levels.WARN)
+  end
 
-  safe_input('Tarea JIRA [opcional]: ', function(task_input)
-    task_code = task_input or ''
+  local task_code, subtask_code = '', ''
+
+  -- 4) Flujo de inputs en cola, con cancelación inmediata
+  ask_input({ prompt = 'JIRA Task [optional]: ' }, function(task_answer)
+    if task_answer == nil then
+      return cancel_all()
+    end
+    task_code = task_answer
 
     if task_code ~= '' then
-      safe_input('Subtarea JIRA [opcional]: ', function(subtask_input)
-        subtask_code = subtask_input or ''
-        complete_and_send()
+      ask_input({ prompt = 'JIRA Subtask [optional]: ' }, function(subtask_answer)
+        if subtask_answer == nil then
+          return cancel_all()
+        end
+        subtask_code = subtask_answer
+        if not cancelled then
+          complete_and_send()
+        end
       end)
     else
-      complete_and_send()
+      if not cancelled then
+        complete_and_send()
+      end
     end
   end)
 
+  -- 5) Ensamblado y envío a Avante
   function complete_and_send()
-    -- Preparar contenido
-    local parts = {}
-    if task_code ~= '' then
-      table.insert(parts, task_code)
-    end
-    if subtask_code ~= '' then
-      table.insert(parts, subtask_code)
+    if cancelled then
+      return
     end
 
-    local commit_jira = table.concat(parts, ' ')
+    local ids = {}
+    if task_code ~= '' then
+      table.insert(ids, task_code)
+    end
+    if subtask_code ~= '' then
+      table.insert(ids, subtask_code)
+    end
+    local commit_jira = table.concat(ids, ' ')
 
     local content = '#' .. shortcut_name .. '\n\n'
     if commit_jira ~= '' then
       content = content .. 'JIRA-ID: ' .. commit_jira .. '\n'
-      content = content .. 'TASK-ID: ' .. task_code .. '\n\n'
+      if task_code ~= '' then
+        content = content .. 'TASK-ID: ' .. task_code .. '\n'
+      end
+      content = content .. '\n'
     end
     content = content .. diff
 
-    -- Enviar a Avante con múltiples métodos de respaldo
+    -- Copias al registro/portapapeles (por si el fallback necesita pegar)
     vim.fn.setreg('a', content)
-    vim.fn.setreg('+', content) -- Portapapeles del sistema como backup
+    vim.fn.setreg('+', content)
 
-    -- Abrir Avante con timeout más largo
+    -- Abrir Avante y pegar contenido (con fallbacks)
     vim.defer_fn(function()
-      vim.cmd 'AvanteAsk'
+      if cancelled then
+        return
+      end
+      pcall(vim.cmd, 'AvanteAsk')
 
       vim.defer_fn(function()
-        local success = pcall(function()
-          -- Intentar método directo primero
+        if cancelled then
+          return
+        end
+
+        local ok = pcall(function()
           local buf = vim.api.nvim_get_current_buf()
-          if vim.bo[buf].filetype == 'Avante' or vim.api.nvim_buf_get_name(buf):match 'Avante' then
-            vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(content, '\n'))
+          local name = vim.api.nvim_buf_get_name(buf) or ''
+          local is_avante = (vim.bo[buf].filetype == 'Avante') or name:match 'Avante'
+
+          if is_avante then
+            vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(content, '\n', { plain = true }))
           else
-            -- Fallback a comandos normales
-            vim.cmd '%d'
-            if vim.fn.getreg 'a' ~= '' then
-              vim.cmd 'normal! "ap'
+            -- Fallback: reemplazar buffer actual (solo si es modifiable)
+            if vim.bo[buf].modifiable then
+              vim.cmd '%d'
+              if vim.fn.getreg 'a' ~= '' then
+                vim.cmd 'normal! "ap'
+              else
+                vim.cmd 'normal! "+p'
+              end
             else
-              vim.cmd 'normal! "+p'
+              error 'Current buffer is not modifiable'
             end
           end
         end)
 
-        if not success then
-          print 'Contenido copiado al portapapeles. Pégalo manualmente con "+p'
+        if not ok then
+          vim.notify('Content copied to clipboard. Paste manually with "+p', vim.log.levels.WARN)
         end
-      end, 800)
-    end, 300)
+      end, 300)
+    end, 200)
   end
 end
 
@@ -1314,6 +1365,7 @@ require('lazy').setup({
   require 'custom.plugins.auto-tag',
   require 'custom.plugins.avante',
   require 'custom.plugins.ufo',
+  require 'custom.plugins.snacks',
   -- require 'custom.plugins.mcphub',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
