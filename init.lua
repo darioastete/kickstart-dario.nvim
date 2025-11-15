@@ -246,28 +246,97 @@ local function generate_commit_with_shortcut(shortcut_name)
     end
   end
 
-  -- Guardar en registro con escape
-  local content = '#' .. shortcut_name .. '\n\n' .. diff
-  vim.fn.setreg('a', content) -- Usar registro 'a'
+  -- Wrapper seguro para inputs anidados
+  local function safe_input(prompt, callback, default)
+    vim.ui.input({
+      prompt = prompt,
+      default = default or '',
+      relative = 'editor',
+      position = 'center',
+      border = 'rounded',
+      width = 0.4,
+      row = '50%',
+      col = '50%',
+      cancelreturn = nil, -- Importante: no retornar string vacío en cancelar
+    }, function(input)
+      -- Llamar al callback incluso si input es nil (cancelado)
+      callback(input)
+    end)
+  end
 
-  -- Abrir AvanteAsk
-  vim.cmd 'AvanteAsk'
+  -- Cola de inputs
+  local task_code = ''
+  local subtask_code = ''
 
-  -- Esperar y pegar
-  vim.defer_fn(function()
-    -- Limpiar buffer si tiene contenido
-    vim.cmd '%d'
-    -- Pegar del registro
-    vim.cmd 'normal! "ap'
-  end, 300)
+  safe_input('Tarea JIRA [opcional]: ', function(task_input)
+    task_code = task_input or ''
+
+    if task_code ~= '' then
+      safe_input('Subtarea JIRA [opcional]: ', function(subtask_input)
+        subtask_code = subtask_input or ''
+        complete_and_send()
+      end)
+    else
+      complete_and_send()
+    end
+  end)
+
+  function complete_and_send()
+    -- Preparar contenido
+    local parts = {}
+    if task_code ~= '' then
+      table.insert(parts, task_code)
+    end
+    if subtask_code ~= '' then
+      table.insert(parts, subtask_code)
+    end
+
+    local commit_jira = table.concat(parts, ' ')
+
+    local content = '#' .. shortcut_name .. '\n\n'
+    if commit_jira ~= '' then
+      content = content .. 'JIRA-ID: ' .. commit_jira .. '\n'
+      content = content .. 'TASK-ID: ' .. task_code .. '\n\n'
+    end
+    content = content .. diff
+
+    -- Enviar a Avante con múltiples métodos de respaldo
+    vim.fn.setreg('a', content)
+    vim.fn.setreg('+', content) -- Portapapeles del sistema como backup
+
+    -- Abrir Avante con timeout más largo
+    vim.defer_fn(function()
+      vim.cmd 'AvanteAsk'
+
+      vim.defer_fn(function()
+        local success = pcall(function()
+          -- Intentar método directo primero
+          local buf = vim.api.nvim_get_current_buf()
+          if vim.bo[buf].filetype == 'Avante' or vim.api.nvim_buf_get_name(buf):match 'Avante' then
+            vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(content, '\n'))
+          else
+            -- Fallback a comandos normales
+            vim.cmd '%d'
+            if vim.fn.getreg 'a' ~= '' then
+              vim.cmd 'normal! "ap'
+            else
+              vim.cmd 'normal! "+p'
+            end
+          end
+        end)
+
+        if not success then
+          print 'Contenido copiado al portapapeles. Pégalo manualmente con "+p'
+        end
+      end, 800)
+    end, 300)
+  end
 end
 
 vim.keymap.set('n', '<leader>gc', function()
   generate_commit_with_shortcut 'commit_309'
 end, { desc = 'Generate commit from staged changes' })
--- vim.keymap.set('n', '<leader>gc', function()
---   generate_commit_with_shortcut 'commit_309'
--- end, { desc = 'Generate commit from staged changes' })
+
 -- SPLIT CODE PAGE
 -- Split vertical con <leader> + Shift + |
 vim.keymap.set('n', '<leader>|', ':vsplit<CR>', { desc = 'Vertical Split' })

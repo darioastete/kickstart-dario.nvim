@@ -72,49 +72,63 @@ return {
         description = 'Generate commit message',
         details = 'Generate a conventional commit message in Spanish analyzing git diff',
         prompt = [[
-          You are a Git and GitHub expert. Analyze the following code diff and generate both:
-          1. A concise and conventional **commit message**.
-          2. A **Pull Request title and description**.
+          You are a Git/GitHub expert. From the given diff (and optional user hints), produce:
+          1) a Conventional Commit message, and
+          2) a Pull Request (PR) title and description.
 
-          ---
+          ## GLOBAL RULES
+          - Input is a unified diff. If the user provides extra hints (type, scope, description, JIRA-ID), respect them.
+          - If the user provides a **type**, use it exactly. If not, infer it from the diff.
+          - If the user provides a **scope**, use it. Otherwise infer it from changed paths (e.g., "auth", "ui", "api", "build").
+          - If the user provides a **description**, complement it with the diff context (do not ignore the diff).
 
-          ### COMMIT MESSAGE RULES
-          - **Format:** <type>(<scope>): <description>
+          ## COMMIT MESSAGE (Conventional Commits)
+          - **Format:** <type>: <JIRA-IDs> <description>
+            - Example (single): `fix: HVACAI-120 update login validation logic`
+            - Example (multiple): `fix: HVACAI-112 HVACAI-113 update sidebar rendering logic and branding`
           - **Allowed types:** feat, fix, docs, style, refactor, test, chore, perf
-          - **If the user provides a type, use it exactly as given.**
-          - **If no type is provided, infer the most appropriate one from the diff.**
-          - **Use infinitive verbs in lowercase** (e.g., "add", "fix", "refactor").
-          - **Do not include a body or footer.**
-          - **The first line must not exceed 50 characters.**
-          - **Follow the Conventional Commits standard strictly.**
-          - **If the description exceeds 50 characters, rephrase it to fit while keeping clarity.**
+          - **Verbs:** infinitive, lowercase (e.g., "add", "fix", "refactor").
+          - **Single line only (no body nor footer).**
+          - **≤ 50 chars** total; if longer, rewrite to fit while keeping clarity.
+          - **Breaking changes:** if clearly present, add `!` after the scope, e.g., `feat(api)!: ...`
+          - Do **not** include JIRA IDs here **unless the user explicitly provided one to include**.
 
-          ---
+          ## PULL REQUEST
+          - **Title structure (mandatory):** `[type]: [JIRA-ID] Short and clear description`
+            - Example: `fix: HVACAI-120 Add frontend form for password reset`
+            - If multiple tickets apply, separate with spaces: `fix: HVACAI-112 HVACAI-113 ...`
+            - Max ~80 chars; if longer, condense while staying clear.
+          - **Description (Markdown) sections:**
+            - `### Summary` – brief what/why.
+            - `### Changes Introduced` – bullet points of key changes.
+            - `### Testing Steps` – numbered steps to verify.
+            - `### Visual Evidence` – optional link(s)/screenshot(s) if UI changes.
+          - Professional and objective tone.
+          - Infer content from the diff; mention impacted modules/components.
+          - If the user supplied a short description, **merge** it with your analysis (do not duplicate).
 
-          ### PULL REQUEST RULES
-          - The **title** should be clear and concise (max 80 characters), ideally expanding on the commit message.
-          - The **description** should summarize:
-            - What was changed.
-            - Why it was changed.
-            - How it impacts the system (optional).
-          - Keep the tone **professional and objective**.
-          - Use Markdown formatting when relevant (e.g., bullet points, short paragraphs).
-
-          ---
-
-          ### INPUT
-          Diff or description:
+          ## INPUT
+          Diff (and optional hints):
           $text
 
-          ---
+          ## OUTPUT
+          Return **only** the following, nothing else:
 
-          ### OUTPUT
-          Return only:
-          1. **Commit message:** in the specified format.
-          2. **Pull Request title:** short and descriptive.
-          3. **Pull Request description:** concise summary in Markdown.
+          Commit message:
+          <one line conventional commit>
 
-          Do not include any explanations or reasoning in the output.
+          PR title:
+          <type>: <JIRA-ID> <short description>
+
+          PR description:
+          ### Summary
+          ...
+          ### Changes Introduced
+          - ...
+          ### Testing Steps
+          1. ...
+          ### Visual Evidence
+          (optional links)
         ]],
       },
       {
