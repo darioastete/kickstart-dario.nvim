@@ -68,6 +68,23 @@ return {
     -- end,
     shortcuts = {
       {
+        name = 'commit_obsidian',
+        description = 'Generate commit message for Obsidian plugin',
+        details = 'Generate a conventional commit message in Spanish analyzing git diff for an Obsidian plugin',
+        prompt = [[
+          I want you to generate a commit message following this format:
+          type: YYYY-MM-DD — short description
+          Where:
+          type can be one of the following: notes, journal, ideas, tasks, research, refactor, cleanup, archive.
+          YYYY-MM-DD is the current date.
+          short description is a very brief summary of what I did in my notes.
+          Context: These are my notes for today:
+          $text
+          Generate only the commit message, professional, clear, and concise.
+          Do not add explanations — only the final commit.
+        ]],
+      },
+      {
         name = 'commit_309',
         description = 'Generate commit message',
         details = 'Generate a conventional commit message in Spanish analyzing git diff',
