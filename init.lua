@@ -969,6 +969,9 @@ require('lazy').setup({
         automatic_installation = false,
         handlers = {
           function(server_name)
+            if server_name == 'copilot' then
+              return
+            end
             local server = servers[server_name] or {}
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
@@ -1212,6 +1215,58 @@ require('lazy').setup({
   -- },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  {
+    'rachartier/tiny-inline-diagnostic.nvim',
+    event = 'VeryLazy',
+    priority = 1000,
+    config = function()
+      require('tiny-inline-diagnostic').setup {
+        options = {
+          add_messages = {
+            display_count = true,
+          },
+          multilines = {
+            enabled = true,
+          },
+        },
+      }
+      vim.diagnostic.config { virtual_text = false } -- Disable Neovim's default virtual text diagnostics
+    end,
+  },
+  {
+    'ggandor/leap.nvim',
+    -- Hacemos caso a la doc: No lazy loading manual
+    lazy = false,
+    config = function()
+      -- Esta línea es OBLIGATORIA para tener las teclas 's' y 'S'
+      -- require('leap').create_default_mappings()
+      -- Mapeo manual
+      local leap = require 'leap'
+
+      -- 's' para ir hacia adelante (abajo)
+      vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)')
+
+      -- 'gs' para ir hacia atrás (arriba) -> Dejas libre la 'S'
+      vim.keymap.set({ 'n', 'x', 'o' }, 'gs', '<Plug>(leap-backward)')
+      -- Opcional: Si quieres borrar las etiquetas cuando terminas de saltar (más limpio)
+      -- require('leap').opts.equivalence_classes = { ' \t\r\n', 'a-z', 'A-Z', '0-9' }
+      -- require('leap').opts.case_sensitive = false
+    end,
+  },
+  -- RECOMENDACIÓN EXTRA: Instala esto junto con Leap
+  -- Mejora las teclas f/F/t/T nativas para que usen la tecnología de Leap
+  {
+    'ggandor/flit.nvim',
+    lazy = false,
+    config = function()
+      require('flit').setup {
+        keys = { f = 'f', F = 'F', t = 't', T = 'T' },
+        -- A: Multilineal. false: Solo en la línea actual (como vim normal)
+        multiline = true,
+        opts = {},
+      }
+    end,
+  },
 
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
