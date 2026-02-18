@@ -926,6 +926,30 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
+        tailwindcss = {
+          settings = {
+            tailwindCSS = {
+              experimental = {
+                classRegex = {
+                  { 'cva\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]' },
+                  { 'cx\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]' },
+                  { 'cn\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]' },
+                  { 'clsx\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]' },
+                },
+              },
+            },
+          },
+        },
+        emmet_language_server = {
+          filetypes = {
+            'html',
+            'css',
+            'typescriptreact',
+            'javascriptreact',
+            'vue',
+            'astro',
+          },
+        },
 
         lua_ls = {
           -- cmd = { ... },
@@ -943,24 +967,12 @@ require('lazy').setup({
         },
       }
 
-      -- Ensure the servers and tools above are installed
-      --
-      -- To check the current status of installed tools and/or manually install
-      -- other tools, you can run
-      --    :Mason
-      --
-      -- You can press `g?` for help in this menu.
-      --
-      -- `mason` had to be setup earlier: to configure its options see the
-      -- `dependencies` table for `nvim-lspconfig` above.
-      --
-      -- You can add other tools here that you want Mason to install
-      -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'vue_ls',
         'vtsls',
+        'emmet-language-server',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -983,7 +995,21 @@ require('lazy').setup({
       }
       vim.lsp.config('vtsls', vtsls_config)
       vim.lsp.config('vue_ls', vue_ls_config)
-      vim.lsp.enable { 'vtsls', 'vue_ls' }
+      vim.lsp.config('tailwindcss', {
+        settings = {
+          tailwindCSS = {
+            experimental = {
+              classRegex = {
+                { 'cva\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]' },
+                { 'cx\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]' },
+                { 'cn\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]' },
+                { 'clsx\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]' },
+              },
+            },
+          },
+        },
+      })
+      vim.lsp.enable { 'vtsls', 'vue_ls', 'tailwindcss' }
     end,
   },
 
