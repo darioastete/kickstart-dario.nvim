@@ -1140,8 +1140,8 @@ require('lazy').setup({
         },
 
         trigger = {
-          shown_on_keyword = true,
-          disable_characters = { '@' }, -- 👈 evita que se active cmp al escribir @
+          show_on_keyword = true,
+          disable_characters = { '@' },
         },
         list = {
           preselect = true,
@@ -1260,7 +1260,8 @@ require('lazy').setup({
     end,
   },
   {
-    'ggandor/leap.nvim',
+    'andyg/leap.nvim',
+    -- url = 'https://codeberg.org/andyg/leap.nvim',
     -- Hacemos caso a la doc: No lazy loading manual
     lazy = false,
     config = function()
@@ -1406,6 +1407,7 @@ require('lazy').setup({
   require 'custom.plugins.avante',
   require 'custom.plugins.ufo',
   require 'custom.plugins.snacks',
+  require 'custom.plugins.pr-pilot',
   -- require 'custom.plugins.mcphub',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
