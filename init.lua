@@ -1141,11 +1141,13 @@ require('lazy').setup({
 
         trigger = {
           show_on_keyword = true,
-          disable_characters = { '@' },
+          show_on_blocked_trigger_characters = { ' ', '\n', '\t', '@' },
         },
         list = {
-          preselect = true,
-          auto_insert = true,
+          selection = {
+            preselect = true,
+            auto_insert = true,
+          },
         },
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
@@ -1260,8 +1262,7 @@ require('lazy').setup({
     end,
   },
   {
-    'andyg/leap.nvim',
-    -- url = 'https://codeberg.org/andyg/leap.nvim',
+    url = 'https://codeberg.org/andyg/leap.nvim',
     -- Hacemos caso a la doc: No lazy loading manual
     lazy = false,
     config = function()
@@ -1335,41 +1336,20 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
-    -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-    opts = {
-      ensure_installed = {
-        'bash',
-        'c',
-        'diff',
-        'html',
-        'lua',
-        'luadoc',
-        'markdown',
-        'markdown_inline',
-        'query',
-        'vim',
-        'vimdoc',
-        'javascript',
-        'typescript',
-        'css',
-      },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-      folds = {
-        enable = true,
-      },
-    },
-    config = function(_, opts)
-      require('nvim-treesitter.configs').setup(opts)
+    config = function()
+      require('nvim-treesitter').install {
+        'bash', 'c', 'diff', 'html', 'lua', 'luadoc',
+        'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
+        'javascript', 'typescript', 'css',
+      }
+
+      vim.api.nvim_create_autocmd('FileType', {
+        callback = function()
+          pcall(vim.treesitter.start)
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+
       vim.opt.foldmethod = 'expr'
       vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
       vim.opt.foldenable = true

@@ -1,24 +1,12 @@
 return {
   'yetone/avante.nvim',
-  -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
-  -- ⚠️ must add this setting! ! !
-  build = function()
-    -- conditionally use the correct build system for the current OS
-    if vim.fn.has 'win32' == 1 then
-      return 'powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false'
-    else
-      return 'make BUILD_FROM_SOURCE=true'
-    end
-  end,
+  build = 'make',
   event = 'VeryLazy',
   version = false, -- Never set this value to "*"! Never!
   ---@module 'avante'
   ---@type avante.Config
   opts = {
-    -- add any opts here
-    -- for example
-    -- provider = 'copilot',
-    provider = 'moonshot',
+    provider = 'copilot',
     providers = {
       openai = {
         endpoint = 'https://api.openai.com/v1',
@@ -53,6 +41,12 @@ return {
       auto_suggestions = false,
       auto_approve_tool_permissions = false,
       confirmation_ui_style = 'inline_buttons',
+    },
+    input = {
+      provider = 'snacks',
+    },
+    selector = {
+      provider = 'fzf_lua',
     },
     -- system_prompt as function ensures LLM always has latest MCP server state
     -- This is evaluated for every message, even in existing chats
@@ -170,8 +164,7 @@ return {
     -- 'nvim-telescope/telescope.nvim', -- for file_selector provider telescope
     -- 'hrsh7th/nvim-cmp', -- autocompletion for avante commands and mentions
     'ibhagwan/fzf-lua', -- for file_selector provider fzf
-    'stevearc/dressing.nvim', -- for input provider dressing
-    'folke/snacks.nvim', -- for input provider snacks
+    'folke/snacks.nvim', -- for input/select UI provider
     'nvim-tree/nvim-web-devicons', -- or echasnovski/mini.icons
     'zbirenbaum/copilot.lua', -- for providers='copilot'
     {

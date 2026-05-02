@@ -25,6 +25,10 @@ External Requirements:
 - Basic utils: `git`, `make`, `unzip`, C Compiler (`gcc`)
 - [ripgrep](https://github.com/BurntSushi/ripgrep#installation),
   [fd-find](https://github.com/sharkdp/fd#installation)
+- [tree-sitter-cli](https://github.com/tree-sitter/tree-sitter/blob/master/cli/README.md): required by nvim-treesitter v1.0+ to compile parsers
+  - macOS: `brew install tree-sitter-cli`
+  - npm: `npm install -g tree-sitter-cli`
+  - cargo: `cargo install tree-sitter-cli`
 - Clipboard tool (xclip/xsel/win32yank or other depending on the platform)
 - A [Nerd Font](https://www.nerdfonts.com/): optional, provides various icons
   - if you have it set `vim.g.have_nerd_font` in `init.lua` to true
@@ -206,6 +210,7 @@ sudo apt install make gcc ripgrep unzip git xclip neovim
 sudo add-apt-repository ppa:neovim-ppa/unstable -y
 sudo apt update
 sudo apt install make gcc ripgrep unzip git xclip neovim
+npm install -g tree-sitter-cli
 ```
 </details>
 <details><summary>Debian Install Steps</summary>
@@ -229,6 +234,7 @@ sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/
 
 ```
 sudo dnf install -y gcc make git ripgrep fd-find unzip neovim
+npm install -g tree-sitter-cli
 ```
 </details>
 
@@ -236,6 +242,7 @@ sudo dnf install -y gcc make git ripgrep fd-find unzip neovim
 
 ```
 sudo pacman -S --noconfirm --needed gcc make git ripgrep fd unzip neovim
+npm install -g tree-sitter-cli
 ```
 </details>
 
