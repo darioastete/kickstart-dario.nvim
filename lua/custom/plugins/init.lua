@@ -46,8 +46,15 @@ return {
     dependencies = { 'JoosepAlviste/nvim-ts-context-commentstring' },
     config = function()
       require('ts_context_commentstring').setup { enable_autocmd = false }
+      local ts_pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
       require('Comment').setup {
-        pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook(),
+        pre_hook = function(ctx)
+          local result = ts_pre_hook(ctx)
+          if result == nil and vim.bo.filetype ~= 'vue' then
+            return vim.bo.commentstring
+          end
+          return result
+        end,
         mappings = {
           basic = false,
           extra = false,

@@ -596,7 +596,7 @@ require('lazy').setup({
       {
         '<leader>s/',
         function()
-          require('fzf-lua').live_grep_glob {
+          require('fzf-lua').live_grep {
             prompt = 'Live Grep in Open Files',
             grep_opts = '--no-ignore --hidden',
             grep_open_files = true,
@@ -614,9 +614,9 @@ require('lazy').setup({
       {
         '<leader>fW',
         function()
-          require('fzf-lua').grep_project {
+          require('fzf-lua').live_grep {
             prompt = '>',
-            grep_opts = '--no-ignore --hidden',
+            rg_opts = '--column --line-number --no-heading --color=always --smart-case --hidden',
           }
         end,
         desc = '[S]earch in [P]roject',
@@ -624,12 +624,21 @@ require('lazy').setup({
     },
     config = function()
       require('fzf-lua').setup {
+        files = {
+          fd_opts = '--type f --hidden --follow --exclude node_modules --exclude .git --exclude dist --exclude build',
+        },
+        grep = {
+          cmd = 'rg --column --line-number --no-heading --color=always --smart-case',
+          rg_glob = true,
+          glob_flag = '--iglob',
+          glob_separator = '%s%-%-',
+        },
         winopts = {
           height = 0.95,
           width = 0.95,
           preview = {
             layout = 'horizontal',
-            horizontal = 'right:75%', -- preview ocupa el 85% de la ventana horizontal
+            horizontal = 'right:75%',
             vertical = 'down:50%',
           },
         },
@@ -1340,7 +1349,7 @@ require('lazy').setup({
       require('nvim-treesitter').install {
         'bash', 'c', 'diff', 'html', 'lua', 'luadoc',
         'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
-        'javascript', 'typescript', 'css',
+        'javascript', 'typescript', 'css', 'vue',
       }
 
       vim.api.nvim_create_autocmd('FileType', {
