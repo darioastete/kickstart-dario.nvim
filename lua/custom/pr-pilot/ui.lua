@@ -15,7 +15,13 @@ function M.open_float(content, opts)
   local width, height, row, col = calc_size(width_ratio, height_ratio)
 
   local buf = vim.api.nvim_create_buf(false, true)
-  local lines = type(content) == "string" and vim.split(content, "\n") or content
+  local raw = type(content) == "string" and vim.split(content, "\n") or content
+  local lines = {}
+  for _, line in ipairs(raw) do
+    for _, subline in ipairs(vim.split(tostring(line), "\n")) do
+      table.insert(lines, subline)
+    end
+  end
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
   vim.bo[buf].filetype = opts.filetype or "markdown"
   vim.bo[buf].modifiable = false
