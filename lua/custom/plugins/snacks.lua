@@ -4,5 +4,8 @@ return {
   opts = {
     input = { enabled = true },
     picker = { enabled = true },
+    bufdelete = { enabled = true },
+    notifier = { enabled = true },
+    scroll = { enabled = false },
   },
 }
