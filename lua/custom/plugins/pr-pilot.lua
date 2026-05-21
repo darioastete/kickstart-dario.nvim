@@ -1,7 +1,6 @@
 return {
   dir = vim.fn.stdpath 'config',
   name = 'pr-pilot',
-  lazy = false,
   cmd = {
     'PRCreate',
     'PRIssue',

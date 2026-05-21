@@ -53,7 +53,7 @@ vim.o.smartcase = true
 vim.o.signcolumn = 'yes'
 
 -- Decrease update time
-vim.o.updatetime = 250
+vim.o.updatetime = 400
 
 -- Decrease mapped sequence wait time
 vim.o.timeoutlen = 300
@@ -1093,34 +1093,24 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
-        -- typescript = { 'prettierd' },
-        -- typescriptreact = { 'prettierd' },
-        formatters_by_ft = {
-          javascript = { 'prettierd' },
-          javascriptreact = { 'prettierd' },
-          typescript = { 'prettierd' },
-          typescriptreact = { 'prettierd' },
-          json = { 'prettierd' },
-          jsonc = { 'prettierd' },
-          html = { 'prettierd' },
-          css = { 'prettierd' },
-          scss = { 'prettierd' },
-          markdown = { 'prettierd' },
-          lua = { 'stylua' },
-          vue = { 'prettierd' },
-        },
+        javascript = { 'prettierd', stop_after_first = true },
+        javascriptreact = { 'prettierd', stop_after_first = true },
+        typescript = { 'prettierd', stop_after_first = true },
+        typescriptreact = { 'prettierd', stop_after_first = true },
+        vue = { 'prettierd', stop_after_first = true },
+        json = { 'prettierd' },
+        jsonc = { 'prettierd' },
+        html = { 'prettierd' },
+        css = { 'prettierd' },
+        scss = { 'prettierd' },
+        markdown = { 'prettierd' },
       },
     },
   },
 
   { -- Autocompletion
     'saghen/blink.cmp',
-    event = 'VimEnter',
+    event = 'InsertEnter',
     version = '1.*',
     dependencies = {
       -- Snippet Engine
@@ -1290,7 +1280,7 @@ require('lazy').setup({
   --   end,
   -- },
   -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  { 'folke/todo-comments.nvim', event = 'VeryLazy', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
   {
     'rachartier/tiny-inline-diagnostic.nvim',
     event = 'VeryLazy',
@@ -1382,6 +1372,10 @@ require('lazy').setup({
       }
 
       vim.api.nvim_create_autocmd('FileType', {
+        pattern = {
+          'lua', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact',
+          'vue', 'html', 'css', 'scss', 'json', 'jsonc', 'markdown', 'bash', 'vim',
+        },
         callback = function()
           pcall(vim.treesitter.start)
           vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
