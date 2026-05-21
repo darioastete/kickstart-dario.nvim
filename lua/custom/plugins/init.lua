@@ -134,11 +134,11 @@ return {
       { '<Leader>l', '<Cmd>MultipleCursorsLock<CR>', mode = { 'n', 'x' }, desc = 'Lock virtual cursors' },
     },
   },
-  {
-    'tris203/precognition.nvim',
-    event = 'VeryLazy',
-    opts = {},
-  },
+  -- {
+  --   'tris203/precognition.nvim',
+  --   event = 'VeryLazy',
+  --   opts = {},
+  -- },
   { 'echasnovski/mini.surround', version = '*' },
   {
     'sphamba/smear-cursor.nvim',
