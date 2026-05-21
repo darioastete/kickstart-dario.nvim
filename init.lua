@@ -1016,10 +1016,11 @@ require('lazy').setup({
 
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
+        'stylua',
         'vue_ls',
         'vtsls',
         'emmet-language-server',
+        'markdownlint',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -1309,38 +1310,28 @@ require('lazy').setup({
     end,
   },
   {
-    url = 'https://codeberg.org/andyg/leap.nvim',
-    -- Hacemos caso a la doc: No lazy loading manual
-    lazy = false,
-    config = function()
-      -- Esta línea es OBLIGATORIA para tener las teclas 's' y 'S'
-      -- require('leap').create_default_mappings()
-      -- Mapeo manual
-      local leap = require 'leap'
-
-      -- 's' para ir hacia adelante (abajo)
-      vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)')
-
-      -- 'gs' para ir hacia atrás (arriba) -> Dejas libre la 'S'
-      vim.keymap.set({ 'n', 'x', 'o' }, 'gs', '<Plug>(leap-backward)')
-      -- Opcional: Si quieres borrar las etiquetas cuando terminas de saltar (más limpio)
-      -- require('leap').opts.equivalence_classes = { ' \t\r\n', 'a-z', 'A-Z', '0-9' }
-      -- require('leap').opts.case_sensitive = false
-    end,
-  },
-  -- RECOMENDACIÓN EXTRA: Instala esto junto con Leap
-  -- Mejora las teclas f/F/t/T nativas para que usen la tecnología de Leap
-  {
-    'ggandor/flit.nvim',
-    lazy = false,
-    config = function()
-      require('flit').setup {
-        keys = { f = 'f', F = 'F', t = 't', T = 'T' },
-        -- A: Multilineal. false: Solo en la línea actual (como vim normal)
-        multiline = true,
-        opts = {},
-      }
-    end,
+    'folke/flash.nvim',
+    event = 'VeryLazy',
+    opts = {
+      modes = {
+        char = {
+          -- f/F/t/T con labels, multilinea
+          enabled = true,
+          jump_labels = true,
+          multi_line = true,
+        },
+        search = {
+          -- activa labels al usar / y ?
+          enabled = true,
+        },
+      },
+    },
+    keys = {
+      { 's', mode = { 'n', 'x', 'o' }, function() require('flash').jump() end, desc = 'Flash jump' },
+      { 'S', mode = { 'n', 'x', 'o' }, function() require('flash').treesitter() end, desc = 'Flash treesitter' },
+      { 'r', mode = 'o', function() require('flash').remote() end, desc = 'Flash remote' },
+      { 'R', mode = { 'o', 'x' }, function() require('flash').treesitter_search() end, desc = 'Flash treesitter search' },
+    },
   },
 
   { -- Collection of various small independent plugins/modules
