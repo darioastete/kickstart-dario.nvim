@@ -116,7 +116,9 @@ return {
   { 'echasnovski/mini.surround', version = '*' },
   {
     'sphamba/smear-cursor.nvim',
-    opts = {},
+    opts = {
+      legacy_computing_symbols_support = false,
+    },
   },
   {
     'karb94/neoscroll.nvim',

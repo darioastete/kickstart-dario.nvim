@@ -18,6 +18,10 @@ return {
       window = {
         mappings = {
           ['\\'] = 'close_window',
+          ['h'] = 'close_node',
+          ['<Left>'] = 'close_node',
+          ['l'] = 'open',
+          ['<Right>'] = 'open',
         },
       },
     },
