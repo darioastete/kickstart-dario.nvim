@@ -150,13 +150,53 @@ vim.keymap.set('n', '<leader>q', '<cmd>q<cr>', { desc = 'Cerrar archivo' })
 vim.keymap.set('v', '<Tab>', '>gv', { desc = 'Indent and reselect' })
 vim.keymap.set('v', '<S-Tab>', '<gv', { desc = 'Unindent and reselect' })
 
-vim.keymap.set('n', '<leader>bn', '<Cmd>BufferNext<CR>', { desc = 'Next Buffer' })
-vim.keymap.set('n', '<leader>bp', '<Cmd>BufferPrevious<CR>', { desc = 'Previus Buffer' })
-vim.keymap.set('n', '<leader>bc', '<Cmd>BufferClose<CR>', { desc = 'Close current buffer' })
-vim.keymap.set('n', '<leader>bb', '<Cmd>BufferPick<CR>', { desc = 'Select buffer (letter)' })
-vim.keymap.set('n', '<leader>bo', '<Cmd>BufferCloseAllButCurrent<CR>', {
-  desc = 'Close All but Current Buffer',
-})
+-- Ciclar buffers (reemplaza BufferNext/Previous de barbar)
+vim.keymap.set('n', ']b', '<cmd>bnext<cr>', { desc = 'Next Buffer' })
+vim.keymap.set('n', '[b', '<cmd>bprevious<cr>', { desc = 'Prev Buffer' })
+
+-- Cerrar buffer sin cerrar la ventana (el pain point clásico de :bd)
+vim.keymap.set('n', '<leader>bd', function()
+  local bufs = vim.fn.getbufinfo { buflisted = 1 }
+  if #bufs <= 1 then
+    vim.cmd 'enew | bd #'
+    return
+  end
+  local cur = vim.api.nvim_get_current_buf()
+  vim.cmd 'bprevious'
+  vim.api.nvim_buf_delete(cur, {})
+end, { desc = 'Delete buffer (keep window)' })
+
+-- Forzar cierre (descarta cambios)
+vim.keymap.set('n', '<leader>bD', function()
+  local cur = vim.api.nvim_get_current_buf()
+  vim.cmd 'bprevious'
+  vim.api.nvim_buf_delete(cur, { force = true })
+end, { desc = 'Force delete buffer' })
+
+-- Cerrar todos excepto el actual
+vim.keymap.set('n', '<leader>bo', function()
+  local cur = vim.api.nvim_get_current_buf()
+  for _, buf in ipairs(vim.fn.getbufinfo { buflisted = 1 }) do
+    if buf.bufnr ~= cur then
+      vim.api.nvim_buf_delete(buf.bufnr, { force = false })
+    end
+  end
+end, { desc = 'Close all other buffers' })
+
+-- Picker de buffers mejorado: ordenado por uso reciente, preview lateral
+vim.keymap.set('n', '<leader>bb', function()
+  require('fzf-lua').buffers {
+    sort_lastused = true,
+    show_unloaded = false,
+    winopts = {
+      height = 0.4,
+      width = 0.55,
+      row = 0.35,
+      preview = { layout = 'vertical', vertical = 'down:40%' },
+    },
+    fzf_opts = { ['--layout'] = 'reverse' },
+  }
+end, { desc = 'Buffer picker (recent first)' })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -1384,7 +1424,7 @@ require('lazy').setup({
   require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
-  require 'kickstart.plugins.neo-tree',
+  -- require 'kickstart.plugins.neo-tree',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'custom.plugins.init',
   require 'custom.plugins.barbar',

@@ -4,6 +4,35 @@
 -- See the kickstart.nvim README for more information
 return {
   {
+    'mikavilpas/yazi.nvim',
+    event = 'VeryLazy',
+    keys = {
+      { '\\', '<cmd>Yazi<cr>', desc = 'Open yazi at current file' },
+      { '<leader>cw', '<cmd>Yazi cwd<cr>', desc = 'Open yazi at cwd' },
+      { '<c-up>', '<cmd>Yazi toggle<cr>', desc = 'Resume last yazi session' },
+    },
+    opts = {
+      open_for_directories = true,
+      highlight_hovered_buffers_in_same_directory = true,
+      floating_window_scaling_factor = 0.9,
+      yazi_floating_window_border = 'rounded',
+      yazi_floating_window_winblend = 0,
+      keymaps = {
+        show_help = '<f1>',
+        open_file_in_vertical_split = '<c-v>',
+        open_file_in_horizontal_split = '<c-x>',
+        open_file_in_tab = '<c-t>',
+        grep_in_directory = '<c-s>',
+        cycle_open_buffers = '<tab>',
+        copy_relative_path_to_selected_files = '<c-y>',
+        send_to_quickfix_list = '<c-q>',
+      },
+    },
+    init = function()
+      vim.g.loaded_netrwPlugin = 1
+    end,
+  },
+  {
     'folke/noice.nvim',
     event = 'VeryLazy',
     opts = {
