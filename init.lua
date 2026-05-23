@@ -230,6 +230,18 @@ local function copy_full_diag()
 end
 vim.keymap.set('n', '<leader>Y', copy_full_diag, { desc = 'Copy Diagnostic Message' })
 
+vim.keymap.set('n', '<leader>yp', function()
+  local path = vim.fn.expand '%:p'
+  vim.fn.setreg('+', path)
+  vim.notify('Copied: ' .. path, vim.log.levels.INFO)
+end, { desc = 'Copy full file path' })
+
+vim.keymap.set('n', '<leader>yr', function()
+  local path = vim.fn.expand '%:~:.'
+  vim.fn.setreg('+', path)
+  vim.notify('Copied: ' .. path, vim.log.levels.INFO)
+end, { desc = 'Copy relative file path' })
+
 --AVANTE
 -- Función que obtiene el diff y genera commit
 local function generate_commit_with_shortcut(shortcut_name)
