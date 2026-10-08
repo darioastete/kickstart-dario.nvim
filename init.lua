@@ -628,7 +628,17 @@ require('lazy').setup({
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     cmd = 'FzfLua',
     keys = {
-      { '<leader>ff', '<cmd>FzfLua files<cr>', desc = '[S]earch [F]iles' },
+      {
+        '<leader>ff',
+        function()
+          require('fzf-lua').files {
+            winopts = {
+              preview = { layout = 'vertical', vertical = 'down:40%' },
+            },
+          }
+        end,
+        desc = '[S]earch [F]iles',
+      },
       { '<leader>fg', '<cmd>FzfLua live_grep<cr>', desc = '[S]earch by [G]rep' },
       { '<leader>fw', '<cmd>FzfLua grep_cword<cr>', desc = '[S]earch current [W]ord' },
       { '<leader>fh', '<cmd>FzfLua help_tags<cr>', desc = '[S]earch [H]elp' },
@@ -1291,7 +1301,41 @@ require('lazy').setup({
   --   end,
   -- },
   -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VeryLazy', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  {
+    'folke/todo-comments.nvim',
+    event = 'VeryLazy',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = {
+      signs = false,
+      keywords = {
+        TODO = { icon = ' ', color = 'info', alt = { 'todo' } },
+        FIXME = { icon = ' ', color = 'error', alt = { 'fix', 'fixme', 'bug' } },
+        HACK = { icon = ' ', color = 'warning', alt = { 'hack' } },
+        WARN = { icon = ' ', color = 'warning', alt = { 'warn', 'warning' } },
+        NOTE = { icon = ' ', color = 'hint', alt = { 'note' } },
+        SAFETY = { icon = '󰒃 ', color = 'hint', alt = { 'safety' } },
+        PERF = { icon = ' ', color = 'test', alt = { 'perf', 'performance' } },
+        REVIEW = { icon = ' ', color = 'default', alt = { 'review' } },
+      },
+      highlight = {
+        multiline = true,
+        multiline_pattern = '^.', -- resalta en comentarios multilínea /* ... */
+        keyword = 'wide_bg', -- resalta TODO: con fondo de color
+        after = '', -- el texto después queda en color normal del comentario
+        pattern = [[.*<<((KEYWORDS)%(\([^)]*\))?):]], -- detecta NOTE:, NOTE(scope):
+        comments_only = true, -- CRÍTICO: solo dentro de comentarios reales (TreeSitter)
+        max_line_len = 400,
+      },
+      colors = {
+        error = { 'DiagnosticError', '#DC2626' },
+        warning = { 'DiagnosticWarn', '#FBBF24' },
+        info = { 'DiagnosticInfo', '#2563EB' },
+        hint = { 'DiagnosticHint', '#10B981' },
+        default = { 'Identifier', '#7C3AED' },
+        test = { 'Identifier', '#FF00FF' },
+      },
+    },
+  },
   {
     'rachartier/tiny-inline-diagnostic.nvim',
     event = 'VeryLazy',
@@ -1328,10 +1372,38 @@ require('lazy').setup({
       },
     },
     keys = {
-      { 's', mode = { 'n', 'x', 'o' }, function() require('flash').jump() end, desc = 'Flash jump' },
-      { 'S', mode = { 'n', 'x', 'o' }, function() require('flash').treesitter() end, desc = 'Flash treesitter' },
-      { 'r', mode = 'o', function() require('flash').remote() end, desc = 'Flash remote' },
-      { 'R', mode = { 'o', 'x' }, function() require('flash').treesitter_search() end, desc = 'Flash treesitter search' },
+      {
+        's',
+        mode = { 'n', 'x', 'o' },
+        function()
+          require('flash').jump()
+        end,
+        desc = 'Flash jump',
+      },
+      {
+        'S',
+        mode = { 'n', 'x', 'o' },
+        function()
+          require('flash').treesitter()
+        end,
+        desc = 'Flash treesitter',
+      },
+      {
+        'r',
+        mode = 'o',
+        function()
+          require('flash').remote()
+        end,
+        desc = 'Flash remote',
+      },
+      {
+        'R',
+        mode = { 'o', 'x' },
+        function()
+          require('flash').treesitter_search()
+        end,
+        desc = 'Flash treesitter search',
+      },
     },
   },
 
@@ -1377,15 +1449,39 @@ require('lazy').setup({
     build = ':TSUpdate',
     config = function()
       require('nvim-treesitter').install {
-        'bash', 'c', 'diff', 'html', 'lua', 'luadoc',
-        'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
-        'javascript', 'typescript', 'css', 'vue',
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'javascript',
+        'typescript',
+        'css',
+        'vue',
       }
 
       vim.api.nvim_create_autocmd('FileType', {
         pattern = {
-          'lua', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact',
-          'vue', 'html', 'css', 'scss', 'json', 'jsonc', 'markdown', 'bash', 'vim',
+          'lua',
+          'javascript',
+          'typescript',
+          'javascriptreact',
+          'typescriptreact',
+          'vue',
+          'html',
+          'css',
+          'scss',
+          'json',
+          'jsonc',
+          'markdown',
+          'bash',
+          'vim',
         },
         callback = function()
           pcall(vim.treesitter.start)
