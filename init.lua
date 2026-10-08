@@ -1286,8 +1286,12 @@ require('lazy').setup({
     priority = 1000,
     dependencies = { 'rktjmp/lush.nvim' },
     config = function()
+      -- setup() must run before the colorscheme is applied.
+      -- transparent: use the terminal background; floats keep their solid background.
+      require('bluloco').setup {
+        transparent = true,
+      }
       vim.cmd.colorscheme 'bluloco'
-      -- your optional config goes here, see below.
     end,
   },
   -- {
