@@ -1527,7 +1527,7 @@ require('lazy').setup({
   require 'custom.plugins.obsidian',
   -- require 'custom.plugins.nvim-cmp',
   require 'custom.plugins.auto-tag',
-  require 'custom.plugins.avante',
+  -- require 'custom.plugins.avante',
   require 'custom.plugins.ufo',
   require 'custom.plugins.snacks',
   require 'custom.plugins.pr-pilot',
