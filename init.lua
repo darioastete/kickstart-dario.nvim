@@ -39,6 +39,21 @@ vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
 end)
 
+-- Over SSH, copy to the local machine's clipboard with OSC 52.
+--  Paste uses Neovim's own register: most terminals block OSC 52 reads, which would hang.
+--  To paste something copied on the local machine, use the terminal paste (Cmd+V).
+if vim.env.SSH_TTY then
+  local osc52 = require 'vim.ui.clipboard.osc52'
+  local function paste()
+    return { vim.fn.split(vim.fn.getreg '', '\n'), vim.fn.getregtype '' }
+  end
+  vim.g.clipboard = {
+    name = 'OSC 52',
+    copy = { ['+'] = osc52.copy '+', ['*'] = osc52.copy '*' },
+    paste = { ['+'] = paste, ['*'] = paste },
+  }
+end
+
 -- Enable break indent
 vim.o.breakindent = true
 
